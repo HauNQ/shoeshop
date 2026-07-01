@@ -38,5 +38,5 @@ spring:
 # 8. Configure clean SQL logging separate from production
 logging:
   level:
-    org.hibernate.sql: error
+    org.hibernate.SQL: DEBUG
 
