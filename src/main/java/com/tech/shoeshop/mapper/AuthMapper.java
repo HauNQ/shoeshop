@@ -1,0 +1,12 @@
+package com.tech.shoeshop.mapper;
+
+import com.tech.shoeshop.dto.register.RegisterRequest;
+import com.tech.shoeshop.entity.User;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+
+@Mapper(componentModel = "spring")
+public interface AuthMapper {
+    @Mapping(source = "encodedPassword", target = "password")
+    User toEntity(RegisterRequest request, String encodedPassword);
+}

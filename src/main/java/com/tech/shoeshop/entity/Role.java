@@ -1,5 +1,6 @@
 package com.tech.shoeshop.entity;
 
+import com.tech.shoeshop.enums.RoleName;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -21,10 +22,9 @@ public class Role extends BaseEntity{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank
-    @Size(max = 100)
-    @Column(nullable = false, unique = true, length = 100)
-    private String name;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, unique = true)
+    private RoleName name;
 
     @NotBlank
     @Column(nullable = false, length = 255)
