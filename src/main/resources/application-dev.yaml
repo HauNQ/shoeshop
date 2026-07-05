@@ -45,3 +45,9 @@ logging:
   level:
     org.hibernate.SQL: DEBUG
     org.springframework.security: DEBUG
+
+#project:
+#  jwt:
+#    secret_key: ${ACCESS_TOKEN_EXPIRATION}
+#    access_token_expiration: ${ACCESS_TOKEN_EXPIRATION}
+#    refresh_token_expiration: ${REFRESH_TOKEN_EXPIRATION}

@@ -1,6 +1,6 @@
-package com.tech.shoeshop.impl;
+package com.tech.shoeshop.repository.auth;
 
-import com.tech.shoeshop.entity.User;
+import com.tech.shoeshop.entity.auth.User;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 

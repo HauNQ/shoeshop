@@ -1,6 +1,6 @@
-package com.tech.shoeshop.impl;
+package com.tech.shoeshop.repository.auth;
 
-import com.tech.shoeshop.entity.Role;
+import com.tech.shoeshop.entity.auth.Role;
 import com.tech.shoeshop.enums.RoleName;
 import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.Optional;

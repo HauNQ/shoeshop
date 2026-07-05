@@ -1,5 +1,6 @@
-package com.tech.shoeshop.entity;
+package com.tech.shoeshop.entity.auth;
 
+import com.tech.shoeshop.entity.BaseEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

@@ -1,12 +1,10 @@
 package com.tech.shoeshop.data;
 
-import com.tech.shoeshop.dto.register.RegisterRequest;
-import com.tech.shoeshop.entity.Role;
-import com.tech.shoeshop.entity.User;
+import com.tech.shoeshop.entity.auth.Role;
+import com.tech.shoeshop.entity.auth.User;
 import com.tech.shoeshop.enums.RoleName;
-import com.tech.shoeshop.impl.RoleRepository;
-import com.tech.shoeshop.impl.UserRepository;
-import com.tech.shoeshop.service.AuthService;
+import com.tech.shoeshop.repository.auth.RoleRepository;
+import com.tech.shoeshop.repository.auth.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Profile;

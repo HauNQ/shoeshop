@@ -1,8 +1,10 @@
 package com.tech.shoeshop.controller;
 
 import com.tech.shoeshop.common.response.ApiResponse;
-import com.tech.shoeshop.dto.register.RegisterRequest;
-import com.tech.shoeshop.service.AuthService;
+import com.tech.shoeshop.dto.request.auth.LoginRequest;
+import com.tech.shoeshop.dto.request.auth.RegisterRequest;
+import com.tech.shoeshop.dto.response.auth.LoginResponse;
+import com.tech.shoeshop.service.auth.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -30,5 +32,28 @@ public class AuthController {
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.success(HttpStatus.CREATED, "User registered successfully"));
+    }
+
+    /**
+     * Authenticate user.
+     *
+     * @param username and password
+     * @return success response
+     */
+    @PostMapping("/login")
+    public ResponseEntity<ApiResponse<LoginResponse>> verify(@Valid @RequestBody LoginRequest request){
+
+        LoginResponse response = authService.verify(request);
+
+        return ResponseEntity.ok(
+                        ApiResponse.success(
+                                HttpStatus.OK,
+                                "Authenticate user successfully",
+                                response));
+    }
+
+    @GetMapping("/authen-test")
+    public String testAuthen(){
+        return "Test Authen Successfully";
     }
 }

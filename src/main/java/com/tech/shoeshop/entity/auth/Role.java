@@ -1,9 +1,9 @@
-package com.tech.shoeshop.entity;
+package com.tech.shoeshop.entity.auth;
 
+import com.tech.shoeshop.entity.BaseEntity;
 import com.tech.shoeshop.enums.RoleName;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
 import lombok.*;
 
 import java.util.HashSet;
@@ -16,7 +16,7 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Role extends BaseEntity{
+public class Role extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
