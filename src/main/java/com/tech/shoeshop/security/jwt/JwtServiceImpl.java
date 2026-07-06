@@ -1,6 +1,7 @@
 package com.tech.shoeshop.security.jwt;
 
 import com.tech.shoeshop.model.MyUserDetail;
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -15,6 +16,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.function.Function;
 
 @Service
 public class JwtServiceImpl implements JwtService {
@@ -24,10 +26,6 @@ public class JwtServiceImpl implements JwtService {
 
     @Value("${ACCESS_TOKEN_EXPIRATION}")
     private long ACCESS_TOKEN_EXPIRATION;
-
-    private static final String AUTHORITIES = "authorities";
-
-    private static final String EMAIL = "email";
 
     /**
      * Generates a JWT access token for an authenticated user.
@@ -46,6 +44,7 @@ public class JwtServiceImpl implements JwtService {
                 .subject(authentication.getName())
                 .issuedAt(now)
                 .expiration(new Date(now.getTime() + ACCESS_TOKEN_EXPIRATION))
+                .issuer(JwtClaims.ISSUER)
                 .signWith(getKey())
                 .compact();
     }
@@ -54,8 +53,8 @@ public class JwtServiceImpl implements JwtService {
         Map<String, Object> claims = new HashMap<>();
         MyUserDetail myUserDetail = (MyUserDetail) authentication.getPrincipal();
 
-        claims.put(EMAIL, myUserDetail.getEmail());
-        claims.put(AUTHORITIES, authentication.getAuthorities()
+        claims.put(JwtClaims.EMAIL, myUserDetail.getEmail());
+        claims.put(JwtClaims.AUTHORITIES, authentication.getAuthorities()
                 .stream()
                 .map(GrantedAuthority::getAuthority)
                 .toList()
@@ -71,11 +70,37 @@ public class JwtServiceImpl implements JwtService {
 
     @Override
     public String extractUsername(String token) {
-        return "";
+        return extractClaim(token, Claims::getSubject);
     }
 
     @Override
     public boolean validateToken(String token, UserDetails userDetails) {
-        return false;
+        Claims claims = extractAllClaims(token);
+
+        return  claims.getSubject().equals(userDetails.getUsername())
+                && claims.getExpiration().after(new Date())
+                && claims.getIssuer().equals(JwtClaims.ISSUER)
+                && userDetails.isAccountNonLocked()
+                && userDetails.isAccountNonExpired()
+                && userDetails.isCredentialsNonExpired()
+                && userDetails.isEnabled();
+    }
+
+    @Override
+    public boolean isTokenExpired(String token) {
+        return extractClaim(token,Claims::getExpiration).before(new Date());
+    }
+
+    private Claims extractAllClaims(String token){
+        return Jwts.parser()
+                .verifyWith(getKey())
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
+    }
+
+    private <T> T extractClaim(String token, Function<Claims, T> claimResolver){
+        Claims claims = extractAllClaims(token);
+        return claimResolver.apply(claims);
     }
 }
