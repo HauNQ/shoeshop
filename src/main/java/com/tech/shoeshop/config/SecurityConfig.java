@@ -1,6 +1,8 @@
 package com.tech.shoeshop.config;
 
-import com.tech.shoeshop.security.jwt.JwtAuthenticationEntrypoint;
+import com.tech.shoeshop.enums.RoleName;
+import com.tech.shoeshop.security.handler.JwtAccessDeniedHandler;
+import com.tech.shoeshop.security.handler.JwtAuthenticationEntrypoint;
 import com.tech.shoeshop.service.impl.auth.MyUserDetailService;
 import jakarta.servlet.Filter;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +29,7 @@ public class SecurityConfig {
     private final MyUserDetailService myUserDetailService;
     private final Filter jwtAuthenticationFilter;
     private final JwtAuthenticationEntrypoint jwtAuthenticationEntrypoint;
+    private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
 
     /**
      * Security Filter Chain
@@ -39,9 +42,16 @@ public class SecurityConfig {
                 .sessionManagement(
                         session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
-                .exceptionHandling(exception -> exception.authenticationEntryPoint(jwtAuthenticationEntrypoint))
+                .exceptionHandling(exception -> exception
+                                .authenticationEntryPoint(jwtAuthenticationEntrypoint)
+                                .accessDeniedHandler(jwtAccessDeniedHandler)
+                        )
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/authen-test").authenticated()
+                        .requestMatchers("/api/auth/admin-role-test").hasRole("ADMIN")
+                        .requestMatchers("/api/auth/user-role-test").hasRole("USER")
+                        .requestMatchers("/api/auth/admin-authority-test").hasAuthority(RoleName.ROLE_ADMIN.name())
+                        .requestMatchers("/api/auth/user-authority-test").hasAuthority(RoleName.ROLE_USER.name())
                         .requestMatchers("/api/auth/**").permitAll()
                         .anyRequest().authenticated()
                 )

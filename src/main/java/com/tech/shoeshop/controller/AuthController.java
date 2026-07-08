@@ -9,6 +9,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -54,6 +55,26 @@ public class AuthController {
 
     @GetMapping("/authen-test")
     public String testAuthen(){
-        return "Test Authen Successfully";
+        return SecurityContextHolder.getContext().getAuthentication().getAuthorities().toString();
+    }
+
+    @GetMapping("/admin-role-test")
+    public String testRoleAdmin(){
+        return SecurityContextHolder.getContext().getAuthentication().getAuthorities().toString();
+    }
+
+    @GetMapping("/user-role-test")
+    public String testRoleUser(){
+        return SecurityContextHolder.getContext().getAuthentication().getAuthorities().toString();
+    }
+
+    @GetMapping("/admin-authority-test")
+    public String testAuthorityAdmin(){
+        return SecurityContextHolder.getContext().getAuthentication().getAuthorities().toString();
+    }
+
+    @GetMapping("/user-authority-test")
+    public String testAuthorityUser(){
+        return SecurityContextHolder.getContext().getAuthentication().getAuthorities().toString();
     }
 }

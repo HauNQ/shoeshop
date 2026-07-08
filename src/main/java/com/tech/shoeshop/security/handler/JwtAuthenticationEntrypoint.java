@@ -1,4 +1,4 @@
-package com.tech.shoeshop.security.jwt;
+package com.tech.shoeshop.security.handler;
 
 import com.tech.shoeshop.common.response.ErrorResponse;
 import jakarta.servlet.ServletException;
