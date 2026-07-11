@@ -1,4 +1,4 @@
-package com.tech.shoeshop.data;
+package com.tech.shoeshop.dataSeeder;
 
 import com.tech.shoeshop.entity.auth.Role;
 import com.tech.shoeshop.entity.auth.User;
