@@ -1,5 +1,6 @@
 package com.tech.shoeshop.service.impl.product;
 
+import com.tech.shoeshop.dto.request.product.ProductFilterRequest;
 import com.tech.shoeshop.dto.request.product.ProductRequest;
 import com.tech.shoeshop.dto.response.product.ProductResponse;
 import com.tech.shoeshop.entity.product.Category;
@@ -9,10 +10,14 @@ import com.tech.shoeshop.mapper.ProductMapper;
 import com.tech.shoeshop.repository.product.CategoryRepository;
 import com.tech.shoeshop.repository.product.ProductRepository;
 import com.tech.shoeshop.service.product.ProductService;
+import com.tech.shoeshop.specification.ProductSpecification;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -32,7 +37,7 @@ public class ProductServiceImpl implements ProductService {
                 .orElseThrow(() ->
                 {
                     log.warn("Category with id '{}' not found", request.getCategoryId());
-                    return new ResourceNotFoundException("Category not found with id "+ request.getCategoryId());
+                    return new ResourceNotFoundException("Category not found with id " + request.getCategoryId());
                 });
 
         Product newProduct = productMapper.toEntity(request);
@@ -71,7 +76,7 @@ public class ProductServiceImpl implements ProductService {
 
         Product updatedProduct = productRepository.save(product);
 
-        log.info("Product '{}' with id {} updated successfully",updatedProduct.getName(), updatedProduct.getId());
+        log.info("Product '{}' with id {} updated successfully", updatedProduct.getName(), updatedProduct.getId());
 
         return productMapper.toResponse(updatedProduct);
     }
@@ -100,11 +105,32 @@ public class ProductServiceImpl implements ProductService {
                 .orElseThrow(() ->
                 {
                     log.warn("Product with id {} not found", productId);
-                    return new ResourceNotFoundException("Product not found with id "+ productId);
+                    return new ResourceNotFoundException("Product not found with id " + productId);
                 });
 
         log.info("Product with id {} retrieved successfully", productId);
 
         return productMapper.toResponse(product);
+    }
+
+    @Override
+    public List<ProductResponse> getProducts(ProductFilterRequest request) {
+
+        log.info(
+                "Filtering products: name={}, category={}, minPrice={}, maxPrice={}, status={}",
+                request.getName(),
+                request.getCategoryName(),
+                request.getMinPrice(),
+                request.getMaxPrice(),
+                request.getStatus()
+        );
+
+        Specification<Product> spec = ProductSpecification.filter(request);
+
+        List<Product> products = productRepository.findAll(spec);
+
+        return products.stream()
+                .map(productMapper::toResponse)
+                .toList();
     }
 }

@@ -1,7 +1,10 @@
 package com.tech.shoeshop.service.product;
 
+import com.tech.shoeshop.dto.request.product.ProductFilterRequest;
 import com.tech.shoeshop.dto.request.product.ProductRequest;
 import com.tech.shoeshop.dto.response.product.ProductResponse;
+
+import java.util.List;
 
 public interface ProductService {
 
@@ -36,4 +39,12 @@ public interface ProductService {
      * @return the product information
      * */
     ProductResponse getProductById(Long productId);
+
+    /**
+     * Get product by its ID.
+     *
+     * @param product information
+     * @return the product information
+     * */
+    List<ProductResponse> getProducts(ProductFilterRequest request);
 }

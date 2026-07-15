@@ -1,6 +1,7 @@
 package com.tech.shoeshop.controller;
 
 import com.tech.shoeshop.common.response.ApiResponse;
+import com.tech.shoeshop.dto.request.product.ProductFilterRequest;
 import com.tech.shoeshop.dto.request.product.ProductRequest;
 import com.tech.shoeshop.dto.response.product.ProductResponse;
 import com.tech.shoeshop.service.product.ProductService;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/products")
@@ -39,6 +41,20 @@ public class ProductController {
                   "Product retrieved successfully",
                   response
           )
+        );
+    }
+
+    @GetMapping
+    public ResponseEntity<ApiResponse<List<ProductResponse>>> getProducts(@Valid @ModelAttribute ProductFilterRequest request)
+    {
+        List<ProductResponse> response = productService.getProducts(request);
+
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        HttpStatus.OK,
+                        "Products retrieved successfully",
+                        response
+                )
         );
     }
 
