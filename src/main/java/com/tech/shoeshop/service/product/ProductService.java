@@ -1,8 +1,11 @@
 package com.tech.shoeshop.service.product;
 
+import com.tech.shoeshop.common.response.PageResponse;
 import com.tech.shoeshop.dto.request.product.ProductFilterRequest;
 import com.tech.shoeshop.dto.request.product.ProductRequest;
 import com.tech.shoeshop.dto.response.product.ProductResponse;
+import com.tech.shoeshop.entity.product.Product;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -44,7 +47,8 @@ public interface ProductService {
      * Get product by its ID.
      *
      * @param product information
+     * @param pageable
      * @return the product information
      * */
-    List<ProductResponse> getProducts(ProductFilterRequest request);
+    PageResponse<ProductResponse> getProducts(ProductFilterRequest request, Pageable pageable);
 }

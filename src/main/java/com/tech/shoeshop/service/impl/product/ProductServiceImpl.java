@@ -1,10 +1,12 @@
 package com.tech.shoeshop.service.impl.product;
 
+import com.tech.shoeshop.common.response.PageResponse;
 import com.tech.shoeshop.dto.request.product.ProductFilterRequest;
 import com.tech.shoeshop.dto.request.product.ProductRequest;
 import com.tech.shoeshop.dto.response.product.ProductResponse;
 import com.tech.shoeshop.entity.product.Category;
 import com.tech.shoeshop.entity.product.Product;
+import com.tech.shoeshop.exception.BadRequestException;
 import com.tech.shoeshop.exception.ResourceNotFoundException;
 import com.tech.shoeshop.mapper.ProductMapper;
 import com.tech.shoeshop.repository.product.CategoryRepository;
@@ -13,11 +15,15 @@ import com.tech.shoeshop.service.product.ProductService;
 import com.tech.shoeshop.specification.ProductSpecification;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -27,6 +33,7 @@ public class ProductServiceImpl implements ProductService {
     private final ProductMapper productMapper;
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
+    private static final Set<String> ALLOWED_SORT_FIELDS = Set.of("name", "price", "createdAt");
 
     @Override
     @Transactional
@@ -114,7 +121,9 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public List<ProductResponse> getProducts(ProductFilterRequest request) {
+    public PageResponse<ProductResponse> getProducts(ProductFilterRequest request, Pageable pageable) {
+
+        validateSort(pageable);
 
         log.info(
                 "Filtering products: name={}, category={}, minPrice={}, maxPrice={}, status={}",
@@ -127,10 +136,29 @@ public class ProductServiceImpl implements ProductService {
 
         Specification<Product> spec = ProductSpecification.filter(request);
 
-        List<Product> products = productRepository.findAll(spec);
+        Page<Product> productPage = productRepository.findAll(spec, pageable);
 
-        return products.stream()
+        List<ProductResponse> products = productPage
+                .get()
                 .map(productMapper::toResponse)
                 .toList();
+
+        return PageResponse.<ProductResponse>builder()
+                .content(products)
+                .page(productPage.getNumber())
+                .size(productPage.getSize())
+                .totalElement(productPage.getTotalElements())
+                .totalPages(productPage.getTotalPages())
+                .first(productPage.isFirst())
+                .last(productPage.isLast())
+                .build();
+    }
+
+    private void validateSort(Pageable pageable){
+        for(Sort.Order order : pageable.getSort()){
+            if(!ALLOWED_SORT_FIELDS.contains(order.getProperty())){
+                throw new BadRequestException("Sorting by '%s' is not supported".formatted(order.getProperty()));
+            }
+        }
     }
 }

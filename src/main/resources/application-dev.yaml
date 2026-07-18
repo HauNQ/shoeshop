@@ -38,7 +38,12 @@ spring:
     user:
       name: user
       password: 123123
-
+  # 9. Config maximum page size
+  data:
+    web:
+      pageable:
+        default-page-size: 30
+        max-page-size: 100
 
 # 8. Configure logging
 logging:

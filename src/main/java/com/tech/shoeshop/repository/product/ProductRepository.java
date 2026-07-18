@@ -2,6 +2,8 @@ package com.tech.shoeshop.repository.product;
 
 import com.tech.shoeshop.entity.product.Product;
 import com.tech.shoeshop.enums.Status;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.PredicateSpecification;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.EntityGraph;
@@ -66,6 +68,6 @@ public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpec
 
     //Specification
     @EntityGraph(attributePaths = "category")
-    List<Product> findAll(Specification<Product> spec);
+    Page<Product> findAll(Specification<Product> spec, Pageable pageable);
 
 }

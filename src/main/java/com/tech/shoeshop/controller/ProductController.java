@@ -1,6 +1,7 @@
 package com.tech.shoeshop.controller;
 
 import com.tech.shoeshop.common.response.ApiResponse;
+import com.tech.shoeshop.common.response.PageResponse;
 import com.tech.shoeshop.dto.request.product.ProductFilterRequest;
 import com.tech.shoeshop.dto.request.product.ProductRequest;
 import com.tech.shoeshop.dto.response.product.ProductResponse;
@@ -9,6 +10,8 @@ import jakarta.annotation.security.PermitAll;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -45,9 +48,15 @@ public class ProductController {
     }
 
     @GetMapping
-    public ResponseEntity<ApiResponse<List<ProductResponse>>> getProducts(@Valid @ModelAttribute ProductFilterRequest request)
+    public ResponseEntity<ApiResponse<PageResponse<ProductResponse>>> getProducts(
+            @Valid @ModelAttribute ProductFilterRequest request,
+            @PageableDefault(
+                    page = 0,
+                    size = 20
+            )
+            Pageable pageable)
     {
-        List<ProductResponse> response = productService.getProducts(request);
+        PageResponse<ProductResponse> response = productService.getProducts(request, pageable);
 
         return ResponseEntity.ok(
                 ApiResponse.success(
