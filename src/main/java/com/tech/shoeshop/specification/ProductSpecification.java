@@ -7,7 +7,10 @@ import org.springframework.data.jpa.domain.Specification;
 
 import java.math.BigDecimal;
 
-public class ProductSpecification {
+public final class ProductSpecification {
+
+    private ProductSpecification() {
+    }
 
     public static Specification<Product> filter(ProductFilterRequest request){
         return Specification.where(hasName(request.getName()))

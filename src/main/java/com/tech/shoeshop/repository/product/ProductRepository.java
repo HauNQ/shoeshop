@@ -33,6 +33,8 @@ public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpec
 
     List<Product> findByCategory_NameIgnoreCase(String categoryName);
 
+    boolean existsByCategoryId(Long categoryId);
+
     // JPQL
     @Query("""
              SELECT p 

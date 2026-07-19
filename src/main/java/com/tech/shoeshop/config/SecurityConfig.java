@@ -57,6 +57,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/user-authority-test").hasAuthority(RoleName.ROLE_USER.name())
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/products/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/categories/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .httpBasic(Customizer.withDefaults())

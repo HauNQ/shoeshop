@@ -9,7 +9,7 @@ import com.tech.shoeshop.entity.product.Product;
 import com.tech.shoeshop.exception.BadRequestException;
 import com.tech.shoeshop.exception.ResourceNotFoundException;
 import com.tech.shoeshop.mapper.ProductMapper;
-import com.tech.shoeshop.repository.product.CategoryRepository;
+import com.tech.shoeshop.repository.category.CategoryRepository;
 import com.tech.shoeshop.repository.product.ProductRepository;
 import com.tech.shoeshop.service.product.ProductService;
 import com.tech.shoeshop.specification.ProductSpecification;

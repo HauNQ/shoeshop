@@ -44,7 +44,7 @@ public interface ProductService {
     ProductResponse getProductById(Long productId);
 
     /**
-     * Get product by its ID.
+     * Get products.
      *
      * @param product information
      * @param pageable
