@@ -1,11 +1,14 @@
 package com.tech.shoeshop.entity.product;
 
 import com.tech.shoeshop.entity.BaseEntity;
+import com.tech.shoeshop.entity.order.OrderItem;
 import com.tech.shoeshop.enums.Status;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 @Entity
@@ -48,6 +51,13 @@ public class Product extends BaseEntity {
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;
 
+    @OneToMany(
+            cascade = CascadeType.ALL,
+            fetch = FetchType.LAZY,
+            mappedBy = "product",
+            orphanRemoval = false)
+    @Builder.Default
+    private List<OrderItem> orderItems = new ArrayList<>();
 
     @Override
     public boolean equals(Object o) {

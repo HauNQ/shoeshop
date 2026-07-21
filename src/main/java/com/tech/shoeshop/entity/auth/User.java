@@ -1,13 +1,16 @@
 package com.tech.shoeshop.entity.auth;
 
 import com.tech.shoeshop.entity.BaseEntity;
+import com.tech.shoeshop.entity.order.Order;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -49,6 +52,15 @@ public class User extends BaseEntity {
           inverseJoinColumns = @JoinColumn(name = "role_id")
   )
   private Set<Role> roles  = new HashSet<>();
+
+  @OneToMany(
+          fetch = FetchType.LAZY,
+          cascade = CascadeType.ALL,
+          mappedBy = "user",
+          orphanRemoval = true)
+  @Builder.Default
+  private List<Order> orders = new ArrayList<>();
+
 
   public void addRole(Role role){
      if(role == null) return;
