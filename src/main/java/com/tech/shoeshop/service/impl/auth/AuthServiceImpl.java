@@ -20,6 +20,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -135,5 +137,16 @@ public class AuthServiceImpl implements AuthService {
                     request.getUsername());
             throw ex;
         }
+    }
+
+    public User getCurrentUser(){
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userRepository.findByUsername(username);
+
+        if(user == null){
+            throw new UsernameNotFoundException("Username not found " + username);
+        }
+
+        return user;
     }
 }

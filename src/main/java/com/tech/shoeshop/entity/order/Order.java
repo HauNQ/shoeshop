@@ -29,8 +29,9 @@ public class Order extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Builder.Default
     @Column(nullable = false, precision = 12, scale = 2)
-    private BigDecimal totalAmount;
+    private BigDecimal totalAmount = BigDecimal.ZERO;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -53,12 +54,16 @@ public class Order extends BaseEntity {
 
         this.orderItems.add(orderItem);
         orderItem.setOrder(this);
+
+        totalAmount = totalAmount.add(orderItem.getSubTotal());
     }
 
     public void removeOrderItem(OrderItem orderItem) {
         Objects.requireNonNull(orderItem, "orderItem must not be null");
 
-        this.orderItems.remove(orderItem);
-        orderItem.setOrder(null);
+        if(this.orderItems.remove(orderItem)){
+            orderItem.setOrder(null);
+            totalAmount = totalAmount.subtract(orderItem.getSubTotal());
+        }
     }
 }

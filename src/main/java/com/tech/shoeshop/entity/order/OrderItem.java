@@ -25,8 +25,9 @@ public class OrderItem extends BaseEntity {
     @Column(nullable = false, precision = 12, scale = 2)
     private BigDecimal unitPrice;
 
+    @Builder.Default
     @Column(nullable = false, precision = 12, scale = 2)
-    private BigDecimal subTotal;
+    private BigDecimal subTotal = BigDecimal.ZERO;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id", nullable = false)
@@ -50,5 +51,10 @@ public class OrderItem extends BaseEntity {
     @Override
     public int hashCode() {
         return this.getClass().hashCode();
+    }
+
+    public void changeQuantity(int quantity){
+        this.quantity = quantity;
+        this.subTotal = unitPrice.multiply(BigDecimal.valueOf(quantity));
     }
 }
