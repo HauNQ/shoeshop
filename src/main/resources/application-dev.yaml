@@ -50,6 +50,7 @@ logging:
   level:
     org.hibernate.SQL: DEBUG
     org.springframework.security: DEBUG
+    com.tech.shoeshop: DEBUG
 
 #project:
 #  jwt:

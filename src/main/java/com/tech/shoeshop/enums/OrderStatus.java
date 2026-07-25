@@ -19,7 +19,7 @@ public enum OrderStatus {
     }
 
     @JsonCreator
-    public OrderStatus fromJson(String value){
+    public static OrderStatus fromJson(String value){
         return Arrays.stream(values())
                 .filter(orderStatus -> orderStatus.name().equalsIgnoreCase(value))
                 .findFirst()

@@ -260,4 +260,18 @@ public class GlobalExceptionHandler {
                 .body(response);
     }
 
+    //Invalid Status Transition
+    @ExceptionHandler(InvalidStatusTransition.class)
+    public ResponseEntity<ErrorResponse> HandlerInvalidStatusTransitionException(BusinessException ex){
+        ErrorResponse response = ErrorResponse.builder()
+                .status(HttpStatus.BAD_REQUEST.value())
+                .message(ex.getMessage())
+                .timestamp(LocalDateTime.now())
+                .build();
+
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(response);
+    }
+
 }

@@ -2,12 +2,14 @@ package com.tech.shoeshop.service.impl.order;
 
 import com.tech.shoeshop.dto.request.order.OrderItemRequest;
 import com.tech.shoeshop.dto.request.order.OrderRequest;
+import com.tech.shoeshop.dto.request.order.OrderStatusRequest;
 import com.tech.shoeshop.dto.response.order.OrderResponse;
 import com.tech.shoeshop.entity.auth.User;
 import com.tech.shoeshop.entity.order.Order;
 import com.tech.shoeshop.entity.order.OrderItem;
 import com.tech.shoeshop.entity.product.Product;
 import com.tech.shoeshop.enums.OrderStatus;
+import com.tech.shoeshop.exception.InvalidStatusTransition;
 import com.tech.shoeshop.exception.ResourceNotFoundException;
 import com.tech.shoeshop.mapper.OrderMapper;
 import com.tech.shoeshop.repository.order.OrderRepository;
@@ -44,7 +46,7 @@ public class OrderServiceImpl implements OrderService {
                 .status(OrderStatus.PENDING)
                 .build();
 
-        for(OrderItemRequest item : orderRequest.getItems()){
+        for (OrderItemRequest item : orderRequest.getItems()) {
             order.addOrderItem(convertToOrderItem(item));
         }
 
@@ -55,7 +57,33 @@ public class OrderServiceImpl implements OrderService {
         return orderMapper.toResponse(order);
     }
 
-    private OrderItem convertToOrderItem(OrderItemRequest orderItemRequest){
+    @Transactional
+    @Override
+    public OrderResponse updateOrderStatus(Long id, OrderStatusRequest orderStatusRequest) {
+
+        Order order = orderRepository.findById(id)
+                .orElseThrow(() ->{
+                    log.warn("Order with id {} not found", id);
+                    return new ResourceNotFoundException("Not found Order with Id " + id);
+                });
+
+        OrderStatus currentStatus = order.getStatus();
+        OrderStatus newStatus = orderStatusRequest.getOrderStatus();
+
+        log.debug("Updating order {} from {} to {}", id, currentStatus, newStatus);
+
+        if(!canTransition(currentStatus, newStatus)){
+            throw new InvalidStatusTransition(currentStatus.name(), newStatus.name());
+        }
+
+        order.setStatus(newStatus);
+
+        log.debug("Order {} status changed from {} to {}", order.getId(), currentStatus, newStatus);
+
+        return orderMapper.toResponse(order);
+    }
+
+    private OrderItem convertToOrderItem(OrderItemRequest orderItemRequest) {
 
         Product product = productRepository.findById(orderItemRequest.getProductId())
                 .orElseThrow(() ->
@@ -70,5 +98,15 @@ public class OrderServiceImpl implements OrderService {
                 .unitPrice(product.getPrice())
                 .subTotal(product.getPrice().multiply(BigDecimal.valueOf(orderItemRequest.getQuantity())))
                 .build();
+    }
+
+    private boolean canTransition(OrderStatus currentStatus, OrderStatus newStatus) {
+        return switch (currentStatus) {
+            case PENDING -> newStatus == OrderStatus.CONFIRMED || newStatus == OrderStatus.CANCELLED;
+            case CONFIRMED -> newStatus == OrderStatus.PROCESSING || newStatus == OrderStatus.CANCELLED;
+            case PROCESSING -> newStatus == OrderStatus.SHIPPED || newStatus == OrderStatus.CANCELLED;
+            case SHIPPED -> newStatus == OrderStatus.DELIVERED;
+            case DELIVERED, CANCELLED -> false;
+        };
     }
 }
