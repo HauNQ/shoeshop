@@ -9,6 +9,8 @@ import com.tech.shoeshop.entity.order.Order;
 import com.tech.shoeshop.entity.order.OrderItem;
 import com.tech.shoeshop.entity.product.Product;
 import com.tech.shoeshop.enums.OrderStatus;
+import com.tech.shoeshop.enums.Status;
+import com.tech.shoeshop.exception.InsufficientStockException;
 import com.tech.shoeshop.exception.InvalidStatusTransition;
 import com.tech.shoeshop.exception.ResourceNotFoundException;
 import com.tech.shoeshop.mapper.OrderMapper;
@@ -91,6 +93,13 @@ public class OrderServiceImpl implements OrderService {
                     log.warn("Product with id {} not found", orderItemRequest.getProductId());
                     return new ResourceNotFoundException("Product not found with id " + orderItemRequest.getProductId());
                 });
+
+        if(product.getStockQuantity() < orderItemRequest.getQuantity()){
+            log.warn("Insufficient stock for product {}", product.getId());
+            throw new InsufficientStockException("Insufficient stock for product " + product.getId());
+        }
+
+        product.deductInventory(orderItemRequest.getQuantity());
 
         return OrderItem.builder()
                 .product(product)

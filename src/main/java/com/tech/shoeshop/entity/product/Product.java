@@ -70,4 +70,24 @@ public class Product extends BaseEntity {
     public int hashCode() {
         return getClass().hashCode();
     }
+
+    public void deductInventory(int stockQuantity){
+        if(this.stockQuantity.equals(stockQuantity)){
+            this.stockQuantity = 0;
+            this.status = Status.SOLD_OUT;
+        }
+
+        if(this.stockQuantity > stockQuantity){
+            this.stockQuantity -= stockQuantity;
+        }
+    }
+
+    public void addInventory(int stockQuantity){
+
+        if(this.stockQuantity.equals(0)){
+            this.status = Status.ACTIVE;
+        }
+
+        this.stockQuantity += stockQuantity;
+    }
 }

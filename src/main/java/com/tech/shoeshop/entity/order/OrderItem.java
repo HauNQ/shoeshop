@@ -2,6 +2,7 @@ package com.tech.shoeshop.entity.order;
 
 import com.tech.shoeshop.entity.BaseEntity;
 import com.tech.shoeshop.entity.product.Product;
+import com.tech.shoeshop.enums.Status;
 import jakarta.persistence.*;
 import lombok.*;
 
