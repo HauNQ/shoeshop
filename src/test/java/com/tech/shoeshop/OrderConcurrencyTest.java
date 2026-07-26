@@ -46,7 +46,7 @@ public class OrderConcurrencyTest {
     void setUp() {
 
         Product product = Product.builder()
-                .name("Race Condition Test Product 1")
+                .name("Race Condition Test Product 3")
                 .description("aaaa")
                 .status(Status.ACTIVE)
                 .category(categoryRepository.findById(6L).get())
@@ -117,6 +117,14 @@ public class OrderConcurrencyTest {
                 } catch (Exception e) {
 
                     failureCount.incrementAndGet();
+
+                    System.out.println(
+                            Thread.currentThread().getName()
+                                    + " FAILED: "
+                                    + e.getClass().getName()
+                                    + " - "
+                                    + e.getMessage()
+                    );
 
                 } finally {
 

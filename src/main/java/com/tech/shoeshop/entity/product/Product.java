@@ -59,6 +59,10 @@ public class Product extends BaseEntity {
     @Builder.Default
     private List<OrderItem> orderItems = new ArrayList<>();
 
+    // Apply optimistic lock
+    @Version
+    private Long version;
+
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
