@@ -2,14 +2,11 @@ package com.tech.shoeshop.repository.product;
 
 import com.tech.shoeshop.entity.product.Product;
 import com.tech.shoeshop.enums.Status;
+import jakarta.persistence.LockModeType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.PredicateSpecification;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.data.jpa.repository.EntityGraph;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
-import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.repository.*;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
@@ -50,6 +47,15 @@ public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpec
               WHERE LOWER(p.category.name) = LOWER(:categoryName)
             """)
     List<Product> findByCategoryName(@Param("categoryName") String categoryName);
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("""
+            SELECT p 
+            FROM Product p
+            WHERE p.id = :id
+           """)
+    Optional<Product> findByIdWithPessimisticLock(@Param("id") Long id);
+
 
     // Native SQL
     @Query(value = """

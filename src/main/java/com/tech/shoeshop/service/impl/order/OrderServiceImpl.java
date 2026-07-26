@@ -87,7 +87,15 @@ public class OrderServiceImpl implements OrderService {
 
     private OrderItem convertToOrderItem(OrderItemRequest orderItemRequest) {
 
-        Product product = productRepository.findById(orderItemRequest.getProductId())
+//        Product product = productRepository.findById(orderItemRequest.getProductId())
+//                .orElseThrow(() ->
+//                {
+//                    log.warn("Product with id {} not found", orderItemRequest.getProductId());
+//                    return new ResourceNotFoundException("Product not found with id " + orderItemRequest.getProductId());
+//                });
+
+        //Apply pessimistic lock to get product
+        Product product = productRepository.findByIdWithPessimisticLock(orderItemRequest.getProductId())
                 .orElseThrow(() ->
                 {
                     log.warn("Product with id {} not found", orderItemRequest.getProductId());
@@ -98,6 +106,14 @@ public class OrderServiceImpl implements OrderService {
             log.warn("Insufficient stock for product {}", product.getId());
             throw new InsufficientStockException("Insufficient stock for product " + product.getId());
         }
+
+        //Add sleep to test race limit
+//        try{
+//            Thread.sleep(500);
+//        }catch (InterruptedException e){
+//            Thread.currentThread().interrupt();
+//            throw new RuntimeException(e);
+//        }
 
         product.deductInventory(orderItemRequest.getQuantity());
 
