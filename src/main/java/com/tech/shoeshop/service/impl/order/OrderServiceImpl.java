@@ -9,7 +9,6 @@ import com.tech.shoeshop.entity.order.Order;
 import com.tech.shoeshop.entity.order.OrderItem;
 import com.tech.shoeshop.entity.product.Product;
 import com.tech.shoeshop.enums.OrderStatus;
-import com.tech.shoeshop.enums.Status;
 import com.tech.shoeshop.exception.InsufficientStockException;
 import com.tech.shoeshop.exception.InvalidStatusTransition;
 import com.tech.shoeshop.exception.ResourceNotFoundException;
@@ -20,6 +19,9 @@ import com.tech.shoeshop.service.auth.AuthService;
 import com.tech.shoeshop.service.order.OrderService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,6 +37,11 @@ public class OrderServiceImpl implements OrderService {
     private final ProductRepository productRepository;
     private final OrderRepository orderRepository;
 
+    @Retryable(
+            retryFor = ObjectOptimisticLockingFailureException.class,
+            maxAttempts = 3,
+            backoff = @Backoff(delay = 100)
+    )
     @Override
     @Transactional
     public OrderResponse createOrder(OrderRequest orderRequest) {
