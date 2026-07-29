@@ -57,6 +57,17 @@ public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpec
     Optional<Product> findByIdWithPessimisticLock(@Param("id") Long id);
 
 
+    @Modifying(
+            clearAutomatically = true,
+            flushAutomatically = true
+    )
+    @Query("""
+        UPDATE Product p
+        SET p.stockQuantity = p.stockQuantity - :quantity
+        WHERE p.id = :id AND p.stockQuantity >= :quantity
+    """)
+    int deductStock(@Param("id") Long productId, @Param("quantity")  Integer quantity);
+
     // Native SQL
     @Query(value = """
        SELECT *

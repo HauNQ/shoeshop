@@ -46,7 +46,7 @@ public class OrderConcurrencyTest {
     void setUp() {
 
         Product product = Product.builder()
-                .name("Race Condition Test Product 27")
+                .name("Race Condition Test Product 30")
                 .description("aaaa")
                 .status(Status.ACTIVE)
                 .category(categoryRepository.findById(6L).get())

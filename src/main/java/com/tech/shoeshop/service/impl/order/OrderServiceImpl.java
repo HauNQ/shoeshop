@@ -37,11 +37,11 @@ public class OrderServiceImpl implements OrderService {
     private final ProductRepository productRepository;
     private final OrderRepository orderRepository;
 
-    @Retryable(
-            retryFor = ObjectOptimisticLockingFailureException.class,
-            maxAttempts = 3,
-            backoff = @Backoff(delay = 100)
-    )
+//    @Retryable(
+//            retryFor = ObjectOptimisticLockingFailureException.class,
+//            maxAttempts = 3,
+//            backoff = @Backoff(delay = 100)
+//    )
     @Override
     @Transactional
     public OrderResponse createOrder(OrderRequest orderRequest) {
@@ -101,6 +101,13 @@ public class OrderServiceImpl implements OrderService {
                     return new ResourceNotFoundException("Product not found with id " + orderItemRequest.getProductId());
                 });
 
+        int updatedRow = productRepository.deductStock(orderItemRequest.getProductId(), orderItemRequest.getQuantity());
+
+        if(updatedRow <= 0){
+            log.warn("Insufficient stock for product {}", orderItemRequest.getProductId());
+            throw new InsufficientStockException("Insufficient stock for product " + orderItemRequest.getProductId());
+        }
+
         //Apply pessimistic lock to get product
 //        Product product = productRepository.findByIdWithPessimisticLock(orderItemRequest.getProductId())
 //                .orElseThrow(() ->
@@ -109,10 +116,10 @@ public class OrderServiceImpl implements OrderService {
 //                    return new ResourceNotFoundException("Product not found with id " + orderItemRequest.getProductId());
 //                });
 
-        if(product.getStockQuantity() < orderItemRequest.getQuantity()){
-            log.warn("Insufficient stock for product {}", product.getId());
-            throw new InsufficientStockException("Insufficient stock for product " + product.getId());
-        }
+//        if(product.getStockQuantity() < orderItemRequest.getQuantity()){
+//            log.warn("Insufficient stock for product {}", product.getId());
+//            throw new InsufficientStockException("Insufficient stock for product " + product.getId());
+//        }
 
         //Add sleep to test race limit
 //        try{
@@ -122,7 +129,7 @@ public class OrderServiceImpl implements OrderService {
 //            throw new RuntimeException(e);
 //        }
 
-        product.deductInventory(orderItemRequest.getQuantity());
+//        product.deductInventory(orderItemRequest.getQuantity());
 
         return OrderItem.builder()
                 .product(product)
