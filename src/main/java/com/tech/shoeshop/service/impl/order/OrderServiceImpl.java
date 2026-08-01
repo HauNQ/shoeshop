@@ -9,6 +9,7 @@ import com.tech.shoeshop.entity.order.Order;
 import com.tech.shoeshop.entity.order.OrderItem;
 import com.tech.shoeshop.entity.product.Product;
 import com.tech.shoeshop.enums.OrderStatus;
+import com.tech.shoeshop.exception.DuplicateProductException;
 import com.tech.shoeshop.exception.InsufficientStockException;
 import com.tech.shoeshop.exception.InvalidStatusTransition;
 import com.tech.shoeshop.exception.ResourceNotFoundException;
@@ -26,6 +27,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -50,10 +55,16 @@ public class OrderServiceImpl implements OrderService {
 
         log.debug("Creating an order for user {}", user.getUsername());
 
+        validateDuplicateProducts(orderRequest.getItems());
+
         Order order = Order.builder()
                 .user(user)
                 .status(OrderStatus.PENDING)
                 .build();
+
+        orderRequest.getItems().sort(
+                Comparator.comparing(OrderItemRequest::getProductId)
+        );
 
         for (OrderItemRequest item : orderRequest.getItems()) {
             order.addOrderItem(convertToOrderItem(item));
@@ -147,5 +158,19 @@ public class OrderServiceImpl implements OrderService {
             case SHIPPED -> newStatus == OrderStatus.DELIVERED;
             case DELIVERED, CANCELLED -> false;
         };
+    }
+
+    private void validateDuplicateProducts(List<OrderItemRequest> items){
+        Map<Long, Long> count = items.stream()
+                .collect(Collectors
+                        .groupingBy(
+                                OrderItemRequest::getProductId,
+                                Collectors.counting()));
+
+        count.forEach((id, c) -> {
+            if(c > 1){
+                throw new DuplicateProductException("Duplicate product id: "+ id);
+            }
+        } );
     }
 }
