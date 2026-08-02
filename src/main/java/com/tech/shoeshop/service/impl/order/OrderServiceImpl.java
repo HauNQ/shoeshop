@@ -42,7 +42,47 @@ public class OrderServiceImpl implements OrderService {
     private final ProductRepository productRepository;
     private final OrderRepository orderRepository;
 
-//    @Retryable(
+    @Override
+    public OrderResponse findOrderById(Long id) {
+
+        Order order = orderRepository.findOrderById(id).orElseThrow(() ->{
+            log.warn("Order with id {} not found", id);
+            return new ResourceNotFoundException("Not found Order with Id " + id);
+        });
+
+        return orderMapper.toResponse(order);
+    }
+
+    @Override
+    public OrderResponse findOrderDetailById(Long id) {
+        Order order = orderRepository.findOrderDetailById(id).orElseThrow(() ->{
+            log.warn("Order with id {} not found", id);
+            return new ResourceNotFoundException("Not found Order with Id " + id);
+        });
+
+        return orderMapper.toResponse(order);
+    }
+
+    @Override
+    public List<OrderResponse> findAll() {
+        List<Order> orders = orderRepository.findAll();
+
+        return orders.stream()
+                .map(orderMapper::toResponse)
+                .toList();
+    }
+
+    @Override
+    public List<OrderResponse> findAllWithDetails() {
+        List<Order> orders = orderRepository.findAllWithDetails();
+
+        return orders.stream()
+                .map(orderMapper::toResponse)
+                .toList();
+    }
+
+
+    //    @Retryable(
 //            retryFor = ObjectOptimisticLockingFailureException.class,
 //            maxAttempts = 3,
 //            backoff = @Backoff(delay = 100)

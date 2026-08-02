@@ -29,6 +29,7 @@ spring:
     # 5. Fine-tune performance features
     properties:
       hibernate:
+        generate_statistics: true
         format_sql: true
         dialect: org.hibernate.dialect.PostgreSQLDialect
         default_batch_fetch_size: 20 # 6. Fix N+1 select issue

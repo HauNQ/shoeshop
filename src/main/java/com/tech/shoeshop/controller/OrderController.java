@@ -15,12 +15,76 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/orders")
 @RequiredArgsConstructor
 public class OrderController {
     private final OrderService orderService;
+
+
+    @GetMapping("/{id}")
+    public  ResponseEntity<ApiResponse<OrderResponse>> findOrderById(
+            @PathVariable("id")
+            @Positive(message = "Order ID must be greater than 0")
+            Long id)
+    {
+        OrderResponse response = orderService.findOrderById(id);
+
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        HttpStatus.OK,
+                        "Order got successfully",
+                        response
+                )
+        );
+    }
+
+    @GetMapping("")
+    public  ResponseEntity<ApiResponse<List<OrderResponse>>> findAll()
+    {
+        List<OrderResponse> response = orderService.findAll();
+
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        HttpStatus.OK,
+                        "Order got successfully",
+                        response
+                )
+        );
+    }
+
+    @GetMapping("/details/{id}")
+    public  ResponseEntity<ApiResponse<OrderResponse>> findOrderDetailById(
+            @PathVariable("id")
+            @Positive(message = "Order ID must be greater than 0")
+            Long id)
+    {
+        OrderResponse response = orderService.findOrderDetailById(id);
+
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        HttpStatus.OK,
+                        "Order got successfully",
+                        response
+                )
+        );
+    }
+
+    @GetMapping("/details")
+    public  ResponseEntity<ApiResponse<List<OrderResponse>>> findAllWithDetails()
+    {
+        List<OrderResponse> response = orderService.findAllWithDetails();
+
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        HttpStatus.OK,
+                        "Order got successfully",
+                        response
+                )
+        );
+    }
 
     @PostMapping
     public ResponseEntity<ApiResponse<OrderResponse>> createOrder(@Valid @RequestBody OrderRequest orderRequest) {
