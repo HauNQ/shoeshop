@@ -48,6 +48,27 @@ spring:
       pageable:
         default-page-size: 30
         max-page-size: 100
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD}
+      database: ${REDIS_DATABASE:0}
+      connect-timeout: 2s
+      timeout: 2s
+      lettuce:
+        pool:
+          enabled: true
+          max-active: 10
+          max-idle: 8
+          min-idle: 2
+          max-wait: 2s
+  cache:
+    type: redis
+#Cache-Note: two ways to configure cache. We are using RedisConfig, so we donot need to configure cache here.
+#    redis:
+#      time-to-live: 1h    # Default TTL: 1 hour in milliseconds
+#      cache-null-values: false # Do not cache null results
+#End-Cache-Note:
 
 # 8. Configure logging
 logging:
@@ -55,6 +76,7 @@ logging:
     org.hibernate.SQL: DEBUG
     org.springframework.security: DEBUG
     com.tech.shoeshop: DEBUG
+#    org.springframework.boot.autoconfigure: DEBUG
 
 #project:
 #  jwt:

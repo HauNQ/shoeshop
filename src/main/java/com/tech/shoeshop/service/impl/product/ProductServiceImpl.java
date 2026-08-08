@@ -15,6 +15,7 @@ import com.tech.shoeshop.service.product.ProductService;
 import com.tech.shoeshop.specification.ProductSpecification;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -104,6 +105,7 @@ public class ProductServiceImpl implements ProductService {
         log.info("Product with id {} deleted successfully", productId);
     }
 
+    @Cacheable(value = "products", key = "#productId")
     @Override
     public ProductResponse getProductById(Long productId) {
         log.info("Retrieving product with id {}", productId);
