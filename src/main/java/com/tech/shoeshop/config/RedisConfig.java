@@ -33,6 +33,7 @@ public class RedisConfig implements CachingConfigurer {
         BasicPolymorphicTypeValidator typeValidator =
                 BasicPolymorphicTypeValidator.builder()
                         .allowIfSubType("com.tech.shoeshop.")
+                        .allowIfSubType("java.util.")
                         .allowIfSubType("java.math.")
                         .build();
 

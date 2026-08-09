@@ -122,7 +122,17 @@ public class ProductServiceImpl implements ProductService {
         return productMapper.toResponse(product);
     }
 
-    @Override
+    @Cacheable(
+            value = "productList",
+            key = "#request.name + '-' + " +
+                    "#request.categoryName + '-' + " +
+                    "#request.minPrice + '-' + " +
+                    "#request.maxPrice + '-' + " +
+                    "#request.status + '-' + " +
+                    "#pageable.pageNumber + '-' + " +
+                    "#pageable.pageSize + '-' + " +
+                    "#pageable.sort"
+    )
     public PageResponse<ProductResponse> getProducts(ProductFilterRequest request, Pageable pageable) {
 
         validateSort(pageable);
