@@ -15,7 +15,9 @@ import com.tech.shoeshop.service.product.ProductService;
 import com.tech.shoeshop.specification.ProductSpecification;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -37,6 +39,7 @@ public class ProductServiceImpl implements ProductService {
     private static final Set<String> ALLOWED_SORT_FIELDS = Set.of("name", "price", "createdAt");
 
     @Override
+    @CacheEvict(value = "productList", allEntries = true)
     @Transactional
     public ProductResponse createProduct(ProductRequest request) {
         log.info("Creating a new product with name '{}'", request.getName());
@@ -61,6 +64,10 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @Caching( evict=  {
+        @CacheEvict(value = "products", key = "#productId"),
+        @CacheEvict(value = "productList", allEntries = true)
+    })
     @Transactional
     public ProductResponse updateProduct(Long productId, ProductRequest request) {
         log.info("Updating product with id {}", productId);
@@ -90,6 +97,10 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @Caching( evict=  {
+            @CacheEvict(value = "products", key = "#productId"),
+            @CacheEvict(value = "productList", allEntries = true)
+    })
     @Transactional
     public void deleteProduct(Long productId) {
         log.info("Delete product with id {}", productId);
