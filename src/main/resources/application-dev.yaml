@@ -9,7 +9,7 @@ spring:
     name: shoeshop-dev
   # 1. Externalize sensitive database credentials
   datasource:
-    url: jdbc:postgresql://localhost:${POSTGRES_PORT}/shoeshop
+    url: jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT}/shoeshop
     username: ${POSTGRES_USER}
     password: ${POSTGRES_PASSWORD}
     driverClassName: org.postgresql.Driver
