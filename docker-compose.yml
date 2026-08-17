@@ -1,10 +1,69 @@
 services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+    environment:
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE}
+      BACKEND_PORT: ${BACKEND_PORT}
+
+      ACCESS_TOKEN_EXPIRATION: ${ACCESS_TOKEN_EXPIRATION}
+      HIKARI_MAX_POOL: ${HIKARI_MAX_POOL}
+
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_HOST: ${POSTGRES_HOST}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_PORT: ${POSTGRES_PORT}
+      POSTGRES_HOST_PORT: ${POSTGRES_HOST_PORT}
+      POSTGRES_USER: ${POSTGRES_USER}
+
+      REDIS_DATABASE: ${REDIS_DATABASE}
+      REDIS_HOST: ${REDIS_HOST}
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+      REDIS_PORT: ${REDIS_PORT}
+      REDIS_HOST_PORT: ${REDIS_HOST_PORT}
+
+      REFRESH_TOKEN_EXPIRATION: ${REFRESH_TOKEN_EXPIRATION}
+      SECRET_KEY: ${SECRET_KEY}
+
+    ports:
+      - "${BACKEND_HOST_PORT:-8081}:${BACKEND_PORT:-8080}"
+
+    restart: unless-stopped
+
+#    healthcheck:
+#      test:
+#        [
+#          "CMD-SHELL",
+#          "wget --no-verbose --tries=1 --spider http://localhost:8081/actuator/health || exit 1"
+#        ]
+#      interval: 30s
+#      timeout: 5s
+#      retries: 3
+#      start_period: 30s
+
+    networks:
+      - app-network
+
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
   postgres:
     image: postgres:16
     container_name: postgres
 
     ports:
-      - "${POSTGRES_PORT}:5432"
+      - "${POSTGRES_HOST_PORT}:5432"
 
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
@@ -14,12 +73,32 @@ services:
     volumes:
       - db:/var/lib/postgresql/data
 
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+    restart: unless-stopped
+
+    networks:
+      - app-network
+
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
   redis:
     image: redis:7
-    container_name: shoeshop-redis
+    container_name: redis
 
     ports:
-      - "${REDIS_PORT}:6379"
+      - "${REDIS_HOST_PORT}:6379"
 
     volumes:
       - redis-data:/data
@@ -28,6 +107,33 @@ services:
 
     restart: unless-stopped
 
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "redis-cli",
+          "-a",
+          "${REDIS_PASSWORD}",
+          "ping"
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+    networks:
+      - app-network
+
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
 volumes:
   db:
   redis-data:
+
+networks:
+  app-network:
+    driver: bridge
