@@ -17,7 +17,7 @@ import org.springframework.stereotype.Component;
 import java.math.BigDecimal;
 import java.util.List;
 
-@Profile("dev")
+@Profile("test")
 @Slf4j
 @Component
 @RequiredArgsConstructor

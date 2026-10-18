@@ -17,6 +17,7 @@ import com.tech.shoeshop.mapper.OrderMapper;
 import com.tech.shoeshop.repository.order.OrderRepository;
 import com.tech.shoeshop.repository.product.ProductRepository;
 import com.tech.shoeshop.service.auth.AuthService;
+import com.tech.shoeshop.service.event.OutboxService;
 import com.tech.shoeshop.service.order.OrderService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -41,6 +42,7 @@ public class OrderServiceImpl implements OrderService {
     private final AuthService authService;
     private final ProductRepository productRepository;
     private final OrderRepository orderRepository;
+    private final OutboxService outboxService;
 
     @Override
     public OrderResponse findOrderById(Long id) {
@@ -111,6 +113,7 @@ public class OrderServiceImpl implements OrderService {
         }
 
         order = orderRepository.save(order);
+        outboxService.saveOrderCreatedEvent(order);
 
         log.debug("Order {} created successfully for user {}", order.getId(), user.getUsername());
 

@@ -23,7 +23,7 @@ spring:
   jpa:
     database: postgresql
     open-in-view: false # 3. Disable OSIV to save connections
-    show-sql: true
+    show-sql: false
     hibernate:
       ddl-auto: update # 4. Control table generation safely
     # 5. Fine-tune performance features
@@ -69,6 +69,14 @@ spring:
 #      time-to-live: 1h    # Default TTL: 1 hour in milliseconds
 #      cache-null-values: false # Do not cache null results
 #End-Cache-Note:
+  kafka:
+    bootstrap-servers: ${KAFKA_URL:localhost:9092}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+      acks: all
+      properties:
+        enable.idempotence: true
 
 # 8. Configure logging
 logging:
@@ -77,6 +85,10 @@ logging:
     org.springframework.security: DEBUG
     com.tech.shoeshop: DEBUG
 #    org.springframework.boot.autoconfigure: DEBUG
+
+outbox:
+  publisher:
+    fixed-delay: 5000
 
 #project:
 #  jwt:
