@@ -77,6 +77,15 @@ spring:
       acks: all
       properties:
         enable.idempotence: true
+    consumer:
+      group-id: shoeshop-email-group
+      auto-offset-reset: earliest
+      enable-auto-commit: false
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+
+      listener:
+        ack-mode: record
 
 # 8. Configure logging
 logging:
