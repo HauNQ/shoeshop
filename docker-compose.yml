@@ -29,6 +29,8 @@ services:
 
       KAFKA_URL: ${KAFKA_URL:-kafka:9092}
 
+      JAVA_TOOL_OPTIONS: "-XX:StartFlightRecording=filename=/tmp/login-test.jfr,settings=profile,duration=180s"
+
     ports:
       - "${BACKEND_HOST_PORT:-8081}:${BACKEND_PORT:-8080}"
 
